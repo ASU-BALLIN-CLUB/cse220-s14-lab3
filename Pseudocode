@@ -1,0 +1,100 @@
+get_token()
+{
+	call skip_blanks;
+	if(word == letter/digit/quote/eof/special)
+	{
+		call get_number/string/special/etc.;
+	}
+return token;
+}
+	
+
+get_char(input: sourcebuffer)
+{
+	ch = first word of sourcebuffer;
+	if(ch = blank)
+	{
+		check for end of line/EOF
+		ch = EOF
+	}
+	else (ch = some word)
+	{
+		ch = word;
+	}
+return ch;
+}
+
+skip_blanks(input: sourcebuffer)
+{
+	count = 0;
+	temp = sourcebuffer[count];	//point temp to first char of source_buffer
+	while ( temp = blank " ")
+	{
+		count++;
+		temp = sourcebuffer[count];
+	}
+return temp;
+}
+
+skip_comment(input: sourcebuffer)
+{
+	temp = first char of sourcebuffer;
+	
+	if(temp = "{")
+	{
+		loop through temp until } is found;
+		break;
+	}
+return temp;
+}
+
+get_word(input: sourcebuffer)
+{
+	extract word from source_buffer;
+	call downshift_word;
+	call is_reserved_word;
+return word;
+}
+
+get_number­(input: sourcebuffer)
+{
+	extract number from source_buffer;
+	parse the number string to an int/double;
+	return the number;
+}
+
+get_string(input: sourcebuffer)
+{
+	extract a substring from the source buffer
+	return the substring;
+}
+
+get_special(input: sourcebuffer)
+{
+	extract the special character from source buffer;
+	check string length
+	if (length = 1)
+		return single character special char;
+	else
+		return double-character special char;
+}
+
+downshift_word(input: word)
+{
+	temp[] = word;
+	for (increment through temp)
+	{
+		temp[i] = tolower(each character of temp)
+	}
+	return temp;
+}
+
+is_reserved_word(input: word)
+{
+	loop to check through the word against the reserved word table;
+
+	if( reserved word = yes)
+		return true;
+	else
+		return false;
+}
