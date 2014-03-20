@@ -1,0 +1,11 @@
+This is a test file which contains multiple lines of code.
+This is the string with the number 92 in it.
+Here is a line of code with certain reserved words: PROGRAM, downto, function, do, if, while, MOD.
+This line of code contains a comment {This is the comment}.
+Here are some special characters: ", +, -, =, %, ^, *.
+
+
+There are a    few   blanks         in  this     line.
+
+THIS LINE IS IN ALL CAPS.
+End of File.
