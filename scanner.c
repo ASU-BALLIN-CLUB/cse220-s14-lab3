@@ -11,17 +11,17 @@
 
 /*******************
  Static functions needed for the scanner
- You need to design the proper parameter list and 
+ You need to design the proper parameter list and
  return types for functions with ???.
  ******************/
 static char get_char(char source_buffer[]);
 static void skip_comment(char source_buffer[]);
 static void skip_blanks(char source_buffer[]);
-static int get_word(char source_buffer[]);
-static int get_number(char source_buffer[]);
-static int get_string(char source_buffer[]);
+static void get_word(char source_buffer[]);
+static void get_number(char source_buffer[]);
+static void get_string(char source_buffer[]);
 static char get_special(char source_buffer[]);
-static char* downshift_word(char source_buffer[]);
+static char downshift_word(char source_buffer[]);
 static BOOLEAN is_reserved_word(char source_buffer[]);
 
 typedef enum
@@ -64,8 +64,8 @@ void init_scanner(FILE *source_file, char source_name[], char date[])
     strcpy(todays_date, date);
     
     /*******************
-     initialize character table, this table is useful for identifying what type of character 
-     we are looking at by setting our array up to be a copy the ascii table.  Since C thinks of 
+     initialize character table, this table is useful for identifying what type of character
+     we are looking at by setting our array up to be a copy the ascii table.  Since C thinks of
      a char as like an int you can use ch in get_token as an index into the table.
      *******************/
     
@@ -73,7 +73,7 @@ void init_scanner(FILE *source_file, char source_name[], char date[])
 BOOLEAN get_source_line(char source_buffer[])
 {
     char print_buffer[MAX_SOURCE_LINE_LENGTH + 9];
-//    char source_buffer[MAX_SOURCE_LINE_LENGTH];  //I've moved this to a function parameter.  Why did I do that?
+    //    char source_buffer[MAX_SOURCE_LINE_LENGTH];  //I've moved this to a function parameter.  Why did I do that?
     static int line_number = 0;
     
     if (fgets(source_buffer, MAX_SOURCE_LINE_LENGTH, src_file) != NULL)
@@ -101,7 +101,7 @@ Token* get_token()
     
     //3.  Call the appropriate function to deal with the cases in 2.
     
-    ??? //What should be returned here?
+    return 'a'; //What should be returned here?
 }
 static char get_char(char source_buffer[])
 {
@@ -114,96 +114,212 @@ static char get_char(char source_buffer[])
     /*
      Write some code to set the character ch to the next character in the buffer
      */
+    return 'a';
 }
-static char* skip_blanks(char source_buffer[])
+
+static void skip_blanks(char source_buffer[])
 {
     /*
      Write some code to skip past the blanks in the program and return a pointer
      to the first non blank character
      */
     int count= 0;
-    char* temp[] =source_buffer[count]
+    char temp[256];
     
-    while(temp == " "){
-        count++;
-        temp = source_buffer[count];
-    }
-    return temp;
+	while(source_buffer[0] == ' '){ // while space exists in the first
+		for(int i = 0; i<strlen(source_buffer); i++){
+			temp[i] = source_buffer[i+1];
+            
+		}
     
 }
-static char* skip_comment(char source_buffer[])
+static void skip_comment(char source_buffer[])
 {
     /*
      Write some code to skip past the comments in the program and return a pointer
      to the first non blank character.  Watch out for the EOF character.
      */
-    char* temp[] =source_buffer[count]
+	char temp[MAX_TOKEN_STRING_LENGTH];
+	char temp2[MAX_TOKEN_STRING_LENGTH];
+	int count = 0;
     
-    if(temp == "{"){
-        for(count = 0, count < strlen(source_buffer), count++){
-        temp = source_buffer[count];
-        if (temp == "}") {
-            break;
+    for(int i = 0; i < strlen(source_buffer); i++)
+    {
+        source_buffer[i] = source_buffer[i+1];
+    }
+    source_buffer[strlen(source_buffer)+1] = '\0';
+    
+    while(source_buffer[0] != '}'){ //AS LONG AS THERE EXISTS A CHARACTER
+		temp[count] = source_buffer[0]; //ASSIGN CHARACTER AT THE CURRENT COUNT OF TEMP TO FIRST CHARACTER OF TOKEN STRING
+        
+		for(int i = 1; i<strlen(source_buffer); i++){ //START PAST FIRST BLANK CHARACTER (
+			temp2[i-1] = source_buffer[i];
+			temp2[i+1] = '\0';
+		}
+        
+		count++;
+        
+		temp[count+1] = '\0';
+	}//End of while
+    source_buffer[0] = ' ';
+    
+}
+    static void get_word(char source_buffer[])
+    {
+        /*
+         Write some code to Extract the word
+         */
+        char temp[MAX_TOKEN_STRING_LENGTH];
+        char uptemp[MAX_TOKEN_STRING_LENGTH];
+        char temp2[MAX_TOKEN_STRING_LENGTH];
+        int count = 0;
+        
+        for(int i = 0; i < strlen(uptemp); i++)
+        {
+            uptemp[i] = ' ';
         }
+        
+        
+        while(isalpha(source_buffer[0])){ //AS LONG AS THERE EXISTS A CHARACTER
+            temp[count] = source_buffer[0]; //ASSIGN CHARACTER AT THE CURRENT COUNT OF TEMP TO FIRST CHARACTER OF TOKEN STRING
+            
+            for(int i = 1; i<strlen(source_buffer); i++){ //START PAST FIRST BLANK CHARACTER (
+                temp2[i-1] = source_buffer[i];
+                temp2[i+1] = '\0';
+            }
+            
+            transfer(source_buffer, temp2);
+            
+            count++;
+            
+            temp[count+1] = '\0';
+        }//End of while
+        
+        transfer(uptemp, temp);
+        
+        //Downshift the word, to make it lower case
+        for(int i = 0; i<strlen(temp); i++){
+            temp[i] = tolower(temp[i]);
+        }
+        
+        int flag = 0;
+        //checks for reserved word
+        for(int i=0; i<35; i++){
+            if(strcmp(temp, reserved[i]) == 0){
+				printf( "\t>> %s\t%s\n", uptemp, temp);
+                line_count++;
+				flag = 1;
+                break;
+            }
+        }
+        
+        if(flag == 0)
+        {
+            printf( "\t>> <INDENTIFIER>\t%s\n", temp);
+            count++;
+        }
+        
+        
+        /*
+         Write some code to Check if the word is a reserved word.
+         if it is not a reserved word its an identifier.
+         */
     }
-    return temp;
-}
-static char* get_word(char source_buffer[])
-{
-    /*
-     Write some code to Extract the word
-     */
-    char temp[256];
-    char temp2[256];
-    char temp3[256];
-    
-    while (isalpha(source_buffer)) {
-        <#statements#>
+    static void get_number(char source_buffer[])
+    {
+        /*
+         Write some code to Extract the number and convert it to a literal number.
+         */
+        char temp[256];
+        char temp2[MAX_TOKEN_STRING_LENGTH];
+        int count = 0;
+        
+        while(isdigit(source_buffer[0]) || (source_buffer[0] == '.') || (source_buffer[0] == 'e') || (source_buffer[0] == '-')){ //AS LONG AS THERE EXISTS A CHARACTER
+            temp[count] = source_buffer[0]; //ASSIGN CHARACTER AT THE CURRENT COUNT OF TEMP TO FIRST CHARACTER OF TOKEN STRING
+            
+            for(int i = 1; i<strlen(source_buffer); i++){ //START PAST FIRST BLANK CHARACTER (
+                temp2[i-1] = source_buffer[i];
+                temp2[i+1] = '\0';
+            }
+            
+            //printf("Temp 1: %s\n", temp);  //Debugging Lines
+            //printf("Temp 2: %s\n", temp2); //Debugged
+            transfer(source_buffer, temp2);
+            
+            count++;
+            
+            temp[count+1] = '\0';
+        }//End of while
+        printf("\t>> <NUMBER>\t%s\n", temp);
+        count++;
     }
-    //Downshift the word, to make it lower case
-    
-    /*
-     Write some code to Check if the word is a reserved word.
-     if it is not a reserved word its an identifier.
-     */
-}
-static int get_number(char source_buffer[])
-{
-    /*
-     Write some code to Extract the number and convert it to a literal number.
-     */
-    
-}
-static int get_string(char source_buffer[])
-{
-    /*
-     Write some code to Extract the string
-     */
-}
-static char get_special(char source_buffer[])
-{
-    /*
-     Write some code to Extract the special token.  Most are single-character
-     some are double-character.  Set the token appropriately.
-     */
-    
-    
-}
-static char* downshift_word(char source_buffer[])
-{
-    /*
-     Make all of the characters in the incoming word lower case.
-     */
-    char* temp[];
-    for (i = 0; i < strlen(source_buffer); i++) {
-        temp[i] = tolower(source_buffer[i]);
+    static void get_string(char source_buffer[])
+    {
+        /*
+         Write some code to Extract the string
+         */
+        /*
+         Write some code to Extract the string
+         */
+        char temp[MAX_TOKEN_STRING_LENGTH];
+        char temp2[MAX_TOKEN_STRING_LENGTH];
+        int count = 0;
+        
+        for(int i = 0; i < strlen(source_buffer); i++)
+        {
+            source_buffer[i] = source_buffer[i+1];
+        }
+        source_buffer[strlen(source_buffer)+1] = '\0';
+        
+        while(source_buffer[0] != '\''){ //AS LONG AS THERE EXISTS A CHARACTER
+            temp[count] = source_buffer[0]; //ASSIGN CHARACTER AT THE CURRENT COUNT OF TEMP TO FIRST CHARACTER OF TOKEN STRING
+            
+            for(int i = 1; i<strlen(source_buffer); i++){ //START PAST FIRST BLANK CHARACTER (
+                temp2[i-1] = source_buffer[i];
+                temp2[i+1] = '\0';
+            }
+            
+            //printf("Temp 1: %s\n", temp);  //Debugging Lines
+            //printf("Temp 2: %s\n", temp2); //Debugged
+            transfer(source_buffer, temp2);
+            
+            count++;
+            
+            temp[count+1] = '\0';
+        }//End of while
+        source_buffer[0] = ' ';
+        
+        
+        printf("\t>> <STRING>\t%s\n", temp);
+        count++;
     }
-    return temp;
-}
-static BOOLEAN is_reserved_word(char source_buffer[])
-{
-    /*
-     Examine the reserved word table and determine if the function input is a reserved word.
-     */
-    
-}
+    static char get_special(char source_buffer[])
+    {
+        int count =0;
+        /*
+         Write some code to Extract the special token.  Most are single-character
+         some are double-character.  Set the token appropriately.
+         */
+        printf("\t>> %c\t%c\n", source_buffer[0], source_buffer[0]);
+        count++;
+        source_buffer[0] = ' ';
+        
+    }
+    static char downshift_word(char source_buffer[])
+    {
+        /*
+         Make all of the characters in the incoming word lower case.
+         */
+        char temp[256];
+        for (int i = 0; i < strlen(source_buffer); i++) {
+            temp[i] = tolower(source_buffer[i]);
+        }
+        return temp[strlen(source_buffer)];
+    }
+    static BOOLEAN is_reserved_word(char character)
+    {
+        /*
+         Examine the reserved word table and determine if the function input is a reserved word.
+         */
+        return FALSE;
+    }
